@@ -1,0 +1,104 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+
+const LinkedInDashboard = () => {
+  // Sample data (adapt it with actual three-month data)
+  const data = [
+    { user: "Elan Kumaran", jobsPosted: 0, projectsCreated: 5, profilesViewed: 8973, profilesSaved: 30, inMailsSent: 2684, inMailAcceptRate: 30, inMailDeclineRate: 7, inMailsAccepted: 804, inMailsDeclined: 182, inMailResponseRate: 37 },
+    { user: "Arun K B", jobsPosted: 0, projectsCreated: 63, profilesViewed: 7763, profilesSaved: 986, inMailsSent: 3882, inMailAcceptRate: 46, inMailDeclineRate: 3, inMailsAccepted: 1781, inMailsDeclined: 129, inMailResponseRate: 49 },
+    // Add other user data similarly
+  ];
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+
+  // Calculate totals
+  const totals = {
+    profilesViewed: data.reduce((sum, item) => sum + item.profilesViewed, 0),
+    inMailsSent: data.reduce((sum, item) => sum + item.inMailsSent, 0),
+    projectsCreated: data.reduce((sum, item) => sum + item.projectsCreated, 0),
+    profilesSaved: data.reduce((sum, item) => sum + item.profilesSaved, 0)
+  };
+
+  return (
+    <div className="p-4">
+      <Card className="mb-4">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-2xl font-bold">LinkedIn Usage Dashboard - 3 Months</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          {/* KPI Summary Row */}
+          <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold">{totals.profilesViewed.toLocaleString()}</div>
+              <p className="text-gray-600">Total Profiles Viewed</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold">{totals.inMailsSent.toLocaleString()}</div>
+              <p className="text-gray-600">Total InMails Sent</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold">{totals.projectsCreated}</div>
+              <p className="text-gray-600">Projects Created</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold">{totals.profilesSaved}</div>
+              <p className="text-gray-600">Profiles Saved</p>
+            </div>
+          </div>
+
+          {/* Charts */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Profiles Viewed Over Time</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={data}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="user" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="profilesViewed" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">InMail Performance</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={data}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="user" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="inMailAcceptRate" stroke="#82ca9d" />
+                  <Line type="monotone" dataKey="inMailDeclineRate" stroke="#8884d8" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Pie Chart for Acceptance vs Decline Rate */}
+          <div className="grid grid-cols-1 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">InMail Acceptance vs. Decline Rates</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie data={data} dataKey="inMailAcceptRate" nameKey="user" cx="50%" cy="50%" outerRadius={100} fill="#00C49F" label>
+                    {data.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default LinkedInDashboard;
