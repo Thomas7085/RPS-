@@ -1,0 +1,175 @@
+Import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+
+const LinkedInDashboard = () => {
+  const data = [
+    { user: "Balaji Mohan", projects: 2, profilesViewed: 6162, inMailsSent: 538, inMailAcceptRate: 27, profilesSaved: 48 },
+    { user: "Naveen Senthilkumar", projects: 1, profilesViewed: 5455, inMailsSent: 255, inMailAcceptRate: 29, profilesSaved: 2 },
+    { user: "Balaji Kumar", projects: 2, profilesViewed: 4647, inMailsSent: 173, inMailAcceptRate: 29, profilesSaved: 0 },
+    { user: "Karthik T", projects: 72, profilesViewed: 3873, inMailsSent: 924, inMailAcceptRate: 35, profilesSaved: 661 },
+    { user: "Vijaya Kannan Selvaraj", projects: 2, profilesViewed: 1946, inMailsSent: 0, inMailAcceptRate: 0, profilesSaved: 3 },
+    { user: "Sinduja Karuppiah", projects: 3, profilesViewed: 1845, inMailsSent: 25, inMailAcceptRate: 24, profilesSaved: 23 },
+    { user: "Abu Husna - Omar", projects: 14, profilesViewed: 631, inMailsSent: 8, inMailAcceptRate: 38, profilesSaved: 4 },
+    { user: "Elya Azham", projects: 4, profilesViewed: 148, inMailsSent: 9, inMailAcceptRate: 44, profilesSaved: 90 },
+    { user: "Stephen H.", projects: 5, profilesViewed: 84, inMailsSent: 31, inMailAcceptRate: 55, profilesSaved: 6 },
+    { user: "Prathap Thangaraj", projects: 0, profilesViewed: 6, inMailsSent: 0, inMailAcceptRate: 0, profilesSaved: 0 }
+  ];
+
+  const [selectedUser, setSelectedUser] = useState('All Users');
+
+  // Filter data based on selected user
+  const filteredData = selectedUser === 'All Users' 
+    ? data 
+    : data.filter(item => item.user === selectedUser);
+
+  // Sort data for top and bottom users
+  const sortedByProfileViews = [...data].sort((a, b) => b.profilesViewed - a.profilesViewed);
+  const topUsers = sortedByProfileViews.slice(0, 5);
+  const bottomUsers = sortedByProfileViews.slice(-5).reverse();
+
+  // Calculate totals based on filtered data
+  const totals = {
+    profilesViewed: filteredData.reduce((sum, item) => sum + item.profilesViewed, 0),
+    inMailsSent: filteredData.reduce((sum, item) => sum + item.inMailsSent, 0),
+    projects: filteredData.reduce((sum, item) => sum + item.projects, 0),
+    profilesSaved: filteredData.reduce((sum, item) => sum + item.profilesSaved, 0)
+  };
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+
+  return (
+    <div className="p-4">
+      <Card className="mb-4">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-2xl font-bold">LinkedIn RPS Usage Report</CardTitle>
+          <div className="flex items-center space-x-4">
+            <label htmlFor="userFilter" className="font-medium">Select User:</label>
+            <select 
+              id="userFilter"
+              value={selectedUser}
+              onChange={(e) => setSelectedUser(e.target.value)}
+              className="p-2 border rounded-md bg-white"
+            >
+              <option value="All Users">All Users</option>
+              {data.map(item => (
+                <option key={item.user} value={item.user}>{item.user}</option>
+              ))}
+            </select>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          {/* KPI Summary Row */}
+          <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold">{totals.profilesViewed.toLocaleString()}</div>
+              <p className="text-gray-600">Profiles Viewed</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold">{totals.inMailsSent.toLocaleString()}</div>
+              <p className="text-gray-600">InMails Sent</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold">{totals.projects}</div>
+              <p className="text-gray-600">Projects</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold">{totals.profilesSaved}</div>
+              <p className="text-gray-600">Profiles Saved</p>
+            </div>
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Profile Views Trend</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={filteredData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="user" angle={-45} textAnchor="end" height={100} />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="profilesViewed" fill="#0088FE" name="Profiles Viewed" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">InMail Performance</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={filteredData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="user" angle={-45} textAnchor="end" height={100} />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="inMailAcceptRate" stroke="#0088FE" name="Accept Rate %" />
+                    <Line type="monotone" dataKey="inMailsSent" stroke="#00C49F" name="InMails Sent" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Tables Row */}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Top Performers</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="px-4 py-2 text-left font-semibold">User</th>
+                      <th className="px-4 py-2 text-left font-semibold">Profiles Viewed</th>
+                      <th className="px-4 py-2 text-left font-semibold">InMails Sent</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topUsers.map((user) => (
+                      <tr key={user.user} className="border-b">
+                        <td className="px-4 py-2">{user.user}</td>
+                        <td className="px-4 py-2">{user.profilesViewed.toLocaleString()}</td>
+                        <td className="px-4 py-2">{user.inMailsSent.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Bottom Performers</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="px-4 py-2 text-left font-semibold">User</th>
+                      <th className="px-4 py-2 text-left font-semibold">Profiles Viewed</th>
+                      <th className="px-4 py-2 text-left font-semibold">InMails Sent</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bottomUsers.map((user) => (
+                      <tr key={user.user} className="border-b">
+                        <td className="px-4 py-2">{user.user}</td>
+                        <td className="px-4 py-2">{user.profilesViewed.toLocaleString()}</td>
+                        <td className="px-4 py-2">{user.inMailsSent.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default LinkedInDashboard;
